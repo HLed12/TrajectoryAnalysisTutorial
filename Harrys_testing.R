@@ -45,16 +45,18 @@ file_path <- "Z:/Resources/mahakamDelta1/Mahakam_1999.rst"
 
 
 # List of all 5 file paths
-file_path99 <- "Z:\Resources\mahakamDelta1\Mahakam_1999.rst"
-file_path14 <- "Z:\Resources\mahakamDelta1\Mahakam_2014.rst"
-file_path18 <- "Z:\Resources\mahakamDelta1\Mahakam_2018.rst"
-file_path20 <- "Z:\Resources\mahakamDelta1\Mahakam_2020.rst"
-file_path22 <- "Z:\Resources\mahakamDelta1\Mahakam_2022.rst"
+file_path99 <- "Z:/Resources/mahakamDelta1/Mahakam_1999.rst"
+file_path14 <- "Z:/Resources/mahakamDelta1/Mahakam_2014.rst"
+file_path18 <- "Z:/Resources/mahakamDelta1/Mahakam_2018.rst"
+file_path20 <- "Z:/Resources/mahakamDelta1/Mahakam_2020.rst"
+file_path22 <- "Z:/Resources/mahakamDelta1/Mahakam_2022.rst"
 
 
 
-##########################################
-# Ignoring Bilintoh's Tutorial from here #
-##########################################
+#######################################################
+# Following Bilintoh's Tutorial from here on our data #
+#######################################################
 
+rasstackY <- terra::rast(system.file(file_path,package="timeseriesTrajectories"))
 
+file.exists(system.file(file_path))
