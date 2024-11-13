@@ -1,0 +1,30 @@
+file format : IDRISI Raster A.1
+file title  : Window from Indonesia_Landcover_2014_v5exp c: 164210 r: 54292 to c: 168837 r: 59239
+data type   : byte
+file type   : binary
+columns     : 4628
+rows        : 4948
+ref. system : cylea15
+ref. units  : m
+unit dist.  : 1.0000000
+min. X      : 12589290.0000000
+max. X      : 12658710.0000000
+min. Y      : -107970.0000000
+max. Y      : -33750.0000000
+pos'n error : unknown
+resolution  : 15
+min. value  : 0
+max. value  : 5
+display min : 1
+display max : 5
+value units : unspecified
+value error : unknown
+flag value  : 0
+flag def'n  : background
+legend cats : 6
+code      1 : Mangrove
+code      2 : Coastal Wetland
+code      3 : Pond Aquaculture
+code      4 : Water
+code      5 : Other Landcover
+code      6 : Missing

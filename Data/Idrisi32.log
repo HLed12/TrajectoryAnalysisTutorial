@@ -1,0 +1,34 @@
+DISPLAY image file Y:\Resources\mahakamDelta1\Mahakam_1999.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file Y:\Resources\mahakamDelta1\Mahakam_2014.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file Y:\Resources\mahakamDelta1\Mahakam_2020.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file Y:\Resources\mahakamDelta1\Mahakam_2022.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_1999.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2014.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2014.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2018.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2020.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2022.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2020.rst*O:\Resources\mahakamDelta1\Mahakam_2022.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2018.rst*O:\Resources\mahakamDelta1\Mahakam_2020.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2014.rst*O:\Resources\mahakamDelta1\Mahakam_2018.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_1999.rst*O:\Resources\mahakamDelta1\Mahakam_2014.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2022.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2022.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+AREA  O:\Resources\mahakamDelta1\Mahakam_2022.rst*3*1
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2020.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+AREA  O:\Resources\mahakamDelta1\Mahakam_2020.rst*3*1
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2018.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+AREA  O:\Resources\mahakamDelta1\Mahakam_2018.rst*3*1
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_2014.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+AREA  O:\Resources\mahakamDelta1\Mahakam_2014.rst*3*1
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_1999.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+AREA  O:\Resources\mahakamDelta1\Mahakam_1999.rst*3*1
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2014.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2018.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2020.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2022.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+DISPLAY image file O:\Resources\mahakamDelta1\Mahakam_1999.rst with symbol file C:\Program Files (x86)\TerrSet2020\Symbols\qual.smp.  Title, Legend.
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2014.rst*O:\Resources\mahakamDelta1\Mahakam_1999.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2018.rst*O:\Resources\mahakamDelta1\Mahakam_2014.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2020.rst*O:\Resources\mahakamDelta1\Mahakam_2018.rst*NONE*NONE*2*none*N
+CROSSTAB  1*O:\Resources\mahakamDelta1\Mahakam_2022.rst*O:\Resources\mahakamDelta1\Mahakam_2020.rst*NONE*NONE*2*none*N
