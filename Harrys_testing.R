@@ -8,6 +8,7 @@ devtools::install_github('bilintoh/timeseriesTrajectories')
 # Our Updates:
 library(timeseriesTrajectories)
 library(terra)
+# also need to ensure RTools is installed for the timeseriesTrajectories package
 ##### 
 
 rasstackY <- terra::rast(system.file("external/binary_raster_stack.tif",package="timeseriesTrajectories"))
@@ -40,7 +41,7 @@ plot(rasstackY_v2, col = terrain.colors(10))
 # Specify the path to your RST file
 # NOTE: you will need to update the file path to where your machine has the data
 #       Also, the '\' will need to be changed to '/'
-file_path <- "Z:/Resources/mahakamDelta1/Mahakam_1999.rst"
+file_path <- "data/Mahakam_1999.rst"
 
 
 
@@ -53,10 +54,13 @@ file_path22 <- "Z:/Resources/mahakamDelta1/Mahakam_2022.rst"
 
 
 
-#######################################################
-# Following Bilintoh's Tutorial from here on our data #
-#######################################################
+# #######################################################
+# # Following Bilintoh's Tutorial from here on our data #
+# #######################################################
+# 
+# rasstackY <- terra::rast(system.file("data/Mahakam_1999.rst",package="timeseriesTrajectories"))
+# 
+# file.exists(system.file(file_path))
 
-rasstackY <- terra::rast(system.file(file_path,package="timeseriesTrajectories"))
 
-file.exists(system.file(file_path))
+# Following regular terra package input
