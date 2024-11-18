@@ -1,0 +1,220 @@
+---
+Title: "A Guide on Trajectory Analysis"
+Author: "Rufai Omowunmi Balogun, Sunita Phuyal, Daniel Neau, Harry Leduc"
+Description: This is the tutorial for the trajectory analysis of the area of interest in R from the beginning  
+Date: "2024-11-15"
+Output: html_document
+---
+
+
+```{r, include= FALSE}
+library(terra)
+library(sp)
+library(raster)
+```
+
+## We need to give the folder path to the data. Here, we are using the Mahakam Delta, Indonesia, where the mangroves are converted into shrimp pond. 
+
+```{r, include=TRUE}
+raster_mahakam1999 <- rast("C:/Users/s_phu/Documents/TrajectoryAnalysisTutorial/Data/Mahakam_1999.rst")
+raster_mahakam2014 <- rast("C:/Users/s_phu/Documents/TrajectoryAnalysisTutorial/Data/Mahakam_2014.rst")
+raster_mahakam2018 <- rast("C:/Users/s_phu/Documents/TrajectoryAnalysisTutorial/Data/Mahakam_2018.rst")
+raster_mahakam2020 <- rast("C:/Users/s_phu/Documents/TrajectoryAnalysisTutorial/Data/Mahakam_2020.rst")
+raster_mahakam2022 <- rast("C:/Users/s_phu/Documents/TrajectoryAnalysisTutorial/Data/Mahakam_2022.rst")
+
+# Extract raster values, count the frequency 
+raster_1999 <- values(raster_mahakam1999)
+frequency_1999 <- table(raster_1999)
+print(frequency_1999)
+
+raster_2014 <- values(raster_mahakam2014)
+frequency_2014 <- table(raster_2014)
+print(frequency_2014)
+
+raster_2018 <- values(raster_mahakam2018)
+frequency_2018 <- table(raster_2018)
+print(frequency_2018)
+
+raster_2020 <- values(raster_mahakam2020)
+frequency_2020 <- table(raster_2020)
+print(frequency_2020)
+
+raster_2022 <- values(raster_mahakam2022)
+frequency_2022 <- table(raster_2022)
+print(frequency_2022)
+```
+
+## Now we can reclassify the raster file as per our objectives. 
+## Here, we are creating boolean map
+
+```{r, include=TRUE}
+## For 1999
+crs(raster_mahakam1999) <- "EPSG:32749"
+raster_1999 <- raster_mahakam1999
+raster_1999[!is.na(raster_1999) & raster_1999 == 1] <- 1  # Mangrove
+raster_1999[!is.na(raster_1999) & raster_1999 != 1] <- 0  # Other
+raster_1999_values <- values(raster_mahakam1999)
+raster_1999_values[!is.na(raster_1999_values) & raster_1999_values == 1] <- 1
+raster_1999_values[!is.na(raster_1999_values) & raster_1999_values != 1] <- 0
+mangrove_1999 <- setValues(raster_mahakam1999, raster_1999_values)
+
+##  For 2014
+crs(raster_mahakam2014) <- "EPSG:32749"
+raster_2014 <- raster_mahakam2014
+raster_2014[!is.na(raster_2014) & raster_2014 == 1] <- 1  # Mangrove
+raster_2014[!is.na(raster_2014) & raster_2014 != 1] <- 0  # Other
+raster_2014_values <- values(raster_mahakam2014)
+raster_2014_values[!is.na(raster_2014_values) & raster_2014_values == 1] <- 1
+raster_2014_values[!is.na(raster_2014_values) & raster_2014_values != 1] <- 0
+mangrove_2014 <- setValues(raster_mahakam2014, raster_2014_values)
+
+# For 2018
+crs(raster_mahakam2018) <- "EPSG:32749"
+raster_2018 <- raster_mahakam2018
+raster_2018[!is.na(raster_2018) & raster_2018 == 1] <- 1  # Mangrove
+raster_2018[!is.na(raster_2018) & raster_2018 != 1] <- 0  # Other
+raster_2018_values <- values(raster_mahakam2018)
+raster_2018_values[!is.na(raster_2018_values) & raster_2018_values == 1] <- 1
+raster_2018_values[!is.na(raster_2018_values) & raster_2018_values != 1] <- 0
+mangrove_2018 <- setValues(raster_mahakam2018, raster_2018_values)
+
+## For 2020
+crs(raster_mahakam2020) <- "EPSG:32749"
+raster_2020 <- raster_mahakam2020
+raster_2020[!is.na(raster_2020) & raster_2020 == 1] <- 1  # Mangrove
+raster_2020[!is.na(raster_2020) & raster_2020 != 1] <- 0  # Other
+raster_2020_values <- values(raster_mahakam2020)
+raster_2020_values[!is.na(raster_2020_values) & raster_2020_values == 1] <- 1
+raster_2020_values[!is.na(raster_2020_values) & raster_2020_values != 1] <- 0
+mangrove_2020 <- setValues(raster_mahakam2020, raster_2020_values)
+
+## For 2022
+crs(raster_mahakam2022) <- "EPSG:32749"
+raster_2022 <- raster_mahakam2022
+raster_2022[!is.na(raster_2022) & raster_2022 == 1] <- 1  # Mangrove
+raster_2022[!is.na(raster_2022) & raster_2022 != 1] <- 0  # Other
+raster_2022_values <- values(raster_mahakam2022)
+raster_2022_values[!is.na(raster_2022_values) & raster_2022_values == 1] <- 1
+raster_2022_values[!is.na(raster_2022_values) & raster_2022_values != 1] <- 0
+mangrove_2022 <- setValues(raster_mahakam2022, raster_2022_values)
+```
+
+## Creating stack map 
+```{r, include=TRUE}
+raster_stack <- c(mangrove_1999, mangrove_2014, mangrove_2018, mangrove_2020, mangrove_2022)
+names(raster_stack) <- c ("1999", "2014", "2018", "2020", "2022")
+
+color_palette <- c("blue", "red")
+
+plot(raster_stack,
+     col = color_palette,
+     main = "Mangrove Trajectory (1999 - 2022)",
+     axes = TRUE)
+writeRaster(raster_stack, "Mangrove_Trajectory_1999_2022.tif", overwrite = TRUE)
+
+## Since we have Created the Boolean Map, we will be working on these maps for Trajectory Analysis
+rasstackY <- terra::rast("Mangrove_Trajectory_1999_2022.tif")
+rasstackY
+
+plot(rasstackY)
+```
+
+# Let's dive into the Trajectory Analysis
+
+
+```{r, include=FALSE}
+##lets load the timeseriesTrajectories package
+
+library(timeseriesTrajectories)
+```
+
+```{r, include=TRUE}
+## reclassifying so that 0 becomes 1 and 1 becomes 2
+reclass_df <- cbind(from = c(1), 
+                    to = c(2), 
+                    becomes = c(2))
+rasstackY_v2 <- classify(rasstackY,reclass_df,include.lowest = TRUE)
+plot(rasstackY_v2)
+
+##Creating time series plot from dataPreview function
+tps = c(1999,2014,2018,2020,2022)
+
+# I know the units of my variable is number of pixels, thus I will create a sting for the vertical units.
+vert_units <- "number of pixels"
+
+# Next, pass the variables to the dataPreview function.
+# NB: xAngle sets the orientation of the horizontal axis labels. See help file for more details.
+dataPreview(rasstackY,
+            timepoints = tps,
+            vertunits = vert_units,
+            xAngle = 0)
+
+## Creating data for the number of presence and change
+num_pres_change <- presenceData(rasstackY, nodata = -999)
+num_pres_change
+
+## Creating map for the number of presence and change
+presencePlot(num_pres_change,
+             pltunit = "m",
+             dataEpsg = 32749,
+             scalePos = "bottomright",
+             narrowPos = "topleft",
+             narrowSize = 1,
+             categoryName = "Mangrove",
+             xAxis = "Longitude (m)",
+             yAxis = "Latitude (m)",
+             axisText = 1,
+             axisLabel = 1,
+             plotTitle = 1.2)
+
+## Creating input data for trajectory plot
+traj_data <- rastertrajData(rasstackY,
+                            zeroabsence = 'yes')
+traj_data
+
+## Creating a map and chart of the trajectory of Mahakam Delta
+trajPlot(traj_data,
+         axisShow = "no",
+         categoryName = "Mangrove",
+         narrowPos = NA,
+         scalePos = NA,
+         scaleSize = 1.5,
+         axisText = 1.2,
+         axisLabel = 1.2,
+         plotTitle = 1,
+         legendTex = 1,
+         xAxis = "Longitude (m)",
+         yAxis = "Latitude (m)",
+         downsample = TRUE)
+
+## Creating input data for plot
+tps = c(2000,2001,2002,2003,2005) ##converting into vector for the time point
+stackbar_data <- rasterstackData(rasstackY,
+                                 timePoints = c(1999,2014,2018,2020,2022),
+                                 spatialextent = 'unified',
+                                 zeroabsence = 'yes',
+                                 annualchange = 'yes',
+                                 categoryName = 'variable',
+                                 regionName = 'region',
+                                 varUnits = "(squre kilometers)",
+                                 constant  = 1)
+stackbar_data
+
+##Now, plotting these data
+stackbarPlot(stackbar_data,
+             axisSize = 10,
+             lbAxSize = 10,
+             lgSize = 7.5,
+             titleSize = 12,
+             datbreaks = "no",
+             upperlym = 35,
+             lowerlym = - 50,
+             lymby = 5,
+             upperlym2 = 0.5,
+             lymby2 = 0.1,
+             xAngle = 0)
+
+```
+
+##In this way we created trajectory of the mangrove.
+## Reference: Bilintoh, T.M., Pontius Jr, R,.G., & Zhang, A., (2024). Methods to compare sites concerning a Category’s change during various time intervals. GIScience & Remote Sensing, 61 (1), 14. https://doi.org/10.1080/15481603.2024.2409484
