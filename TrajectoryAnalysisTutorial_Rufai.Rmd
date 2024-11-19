@@ -1,6 +1,6 @@
 ---
 title: "A How-to Guide for Trajectory Analysis"
-author: "Rufai Omowunmi Balogun, Sunita Phuyal, Daniel Neau, Harry Leduc"
+author: "Rufai Omowunmi Balogun,  Harrison Leduc, Daniel Neau, Sunita Phuyal"
 date: "2024-11-13"
 output: html_document
 ---
@@ -8,40 +8,107 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# A tutorial on how to run an end to end trajectory analysis on categorical remote sensing data
 
-## Introduction to Trajectory Analysis
+## General Overview
+This document showcases with examples, the different steps a user need to take to effectively implement the Trajectory Analysis of long time series of categorical datasets.
 
-Here we give an overview of what trajectory analysis is and why we need it as Remote Sensing/ Land Change Scientists. 
-## Who is this tutorial for?
-Who we anticipate would find this tutorial useful for 
-- Students, 
-- Researchers, 
-- Professionals
+The popular method in land change modelling typically focuses on capturing changes between time points with uniform durations. These kinds of modelling captures are limited 
+because they are not able to capture short term changes within shorter period. The trajectory analysis is a method developed to capture the changes in a category through 
+time across different time intervals and sites whether the duration and sites are uniform or not. These changes in categories are captured in terms of the unified size on 
+each site, the alternation and exchange between categories.
 
-## Tools for performing trajectory analysis
+We show a use case of the evolution of Mangroves Landcover in the Mahakam Delta, Indonesia. This location is a hotspot for Shrimp Pond Aquaculture and hence the transitions 
+(exchange) exists between the Mangrove Land Cover Category and the Pond Aquaculture Category. This document mostly build on the [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) 
+R package and the concepts developed by Bilintoh et al in "Bilintoh, T.M., Pontius Jr, R,.G., & Zhang, A., (2024). Methods to compare sites concerning a Category’s change during various time intervals. 
+GIScience & Remote Sensing, 61 (1), 14. https://doi.org/10.1080/15481603.2024.2409484"
 
-An overview of the different methods and approaches for performing trajectory analysis;
-Here we give an overview of what trajectory analysis is and why we need it as Remote Sensing/ Land Change Scientists.
+In addition to this document, we have prepared an [explainer video](ADD LINK TO EXPLAINER VIDEO HERE) that contains the key concepts necessary for understanding trajectory analysis for remote sensing 
+applications as well as interpreting the output charts produced by the Trajectory Analysis R package. We anticipate this tutorial to be useful for 1.) students (undergraduates and graduates), 
+2.) Researchers, 3.) Professionals, and 4.) Anyone curious about the concepts and applications of trajectory analysis.
 
-## Case study: Mangrove transitions to Shrimp pons in the Mahakam Delta, Indonesia
-An end-to-end analysis of the Mahakam Mangrove Trajectories
 
-### Data Preparation
-- Binarizing data -- Presence/ Absence
+### Requirements
+Since this tutorial was developed in R programming language, we expect the users to have familiarity with the programming language and tools like RTools and RStudio for setting up the development environment.For a quick refresher on the R programming language, see this [crash course on R programming language](https://www.youtube.com/watch?v=ZYdXI1GteDE) and the [Extra Resources](#extra-resources) section of this document. 
+
+## Step 1: Setting up your development environment
+### I. Download and install R and RStudio
+Start by installing the [R programming](https://posit.co/download/rstudio-desktop/) language on your workstation along with the [RStudio IDE](https://posit.co/download/rstudio-desktop/). Select the installers that matches your Operating System. When working with R, you can think of RStudio as the interface and R as the bones.
+
+### II. Download and install RTools
+Select and download the RTools that matches the version of R that you installed in the previous step. See the [Extra Resources](#extra-resources) section of this document for 
+The RTools is required to properly install the R packages used in this tutorial. Here is the [link](https://cran.r-project.org/bin/windows/Rtools/) to the RTools page: <https://cran.r-project.org/bin/windows/Rtools/>
+Click the blue text 'Rtools44 installer'. After the installer has been downloaded click it and go through the wizard. We suggest leaving everything as it is, this will give you a simple base install.
+
+### III. Install the required packages
+
+Run the following:
+
+``` 
+install.packages('devtools')
+devtools::install_github('bilintoh/timeseriesTrajectories')
+```
+The second line will give a prompt with additional directions: when prompted type '1' and hit enter, this will update all necessary packages that [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) uses.
+
+We also use the terra package, run: 
+```
+install.packages('terra')
+```
+
+
+
+## Step 2: Data Preparation
+This sections showcases the steps needed to go from a multi-class categorical data to a binary data format required to run a trajectory analysis.
+
+## Background on our example data
+We are reviewing the Mahakam Delta in Indonesia. Specifically, how mangroves transition to Shrimp ponds. Having trajectories of the Mahakam Mangroves can help give insight to what the future land may look like, impacting shrimp farmers, locals, and the ecosystem as a whole. The [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) R package example has pre-made binary files, which are already in TIF format. However, users do not usually start with a well-prepared datasets as in the example (where we started with a multiclass dataset in a .rst format). Hence, we showcase a simple process for preparing the datasets to capture our category of interest and into the expected data format for  [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) 
 
 ```{r echo=TRUE}
 ## load packages
 library(raster)
 library(terra)
 
-# four categories in our datasets::: Mangrove, Pond Aquaculture, Water, Other LandCover
+# four categories in our datasets::: 1. Mangrove, 2. Pond Aquaculture, 3. Water, and 4. Other LandCover
 ## load datasets
-ras1999 <- rast("C:/Users/rufai/OneDrive/Desktop/GSG Courses/GEOG360/Final\ Project/mahakam_delta_time_series/Mahakam_1999.rst")
-ras2014 <- rast("C:/Users/rufai/OneDrive/Desktop/GSG Courses/GEOG360/Final\ Project/mahakam_delta_time_series/Mahakam_2014.rst")
-ras2018 <- rast("C:/Users/rufai/OneDrive/Desktop/GSG Courses/GEOG360/Final\ Project/mahakam_delta_time_series/Mahakam_2018.rst")
-ras2020 <- rast("C:/Users/rufai/OneDrive/Desktop/GSG Courses/GEOG360/Final\ Project/mahakam_delta_time_series/Mahakam_2020.rst")
-ras2022 <- rast("C:/Users/rufai/OneDrive/Desktop/GSG Courses/GEOG360/Final\ Project/mahakam_delta_time_series/Mahakam_2022.rst")
+ras1999 <- rast("Data/Mahakam_1999.rst")
+ras2014 <- rast("Data/Mahakam_2014.rst")
+ras2018 <- rast("Data//Mahakam_2018.rst")
+ras2020 <- rast("Data//Mahakam_2020.rst")
+ras2022 <- rast("Data//Mahakam_2022.rst")
+```
 
+### We start with these Multiclass datasets across 5 timepoints
+
+```{r echo=FALSE}
+mahakam_rasters <- list(ras1999, ras2014, ras2018, ras2020, ras2022)
+years <- c(1999, 2014, 2018, 2020, 2022)
+par(mfrow = c(2, 3))
+for (i in seq_along(mahakam_rasters)) {
+  plot(mahakam_rasters[[i]], main = paste("Year:", years[i]))
+}
+par(mfrow = c(1, 1))
+```
+
+### I. Ensure all the datasets are in the right projection
+To check the projection of your country of interest, you can use [EPSG.io](https://epsg.io/)
+```{r echo=TRUE}
+mahakam_rasters <- list(ras1999, ras2014, ras2018, ras2020, ras2022)
+for (i in seq_along(mahakam_rasters)) {
+    print(crs(mahakam_rasters[[i]]))
+}
+```
+It is not clear from this what the Coordinate Reference System is, hence we will assign the CRS for the Mahakam Delta to each of our data input to ensure they overlap properly.
+
+```{r echo=TRUE}
+for (i in seq_along(mahakam_rasters)) {
+    crs(mahakam_rasters[[i]]) <- "EPSG:23831"
+    print(crs(mahakam_rasters[[i]]))
+}
+
+```
+
+### II. Binarize the yearly images
+```{r echo=TRUE}
 # extract categories
 categories1999 <- unique(values(ras1999))
 categories1999 <- categories1999[!is.na(categories1999)]
@@ -88,7 +155,14 @@ category_layers1999 <- lapply(categories1999, function(cat) {
   names(layer) <- paste0("category1999_", cat)
   return(layer)
 })
+```
 
+
+
+### III. Stack the category of interest and save
+This step saves the yearly binary images for mangrove into a stack and save as a TIFF file, ready for analysis using the [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) R package. 
+
+```{r echo=TRUE}
 
 # stack mangroves categories across five time points and save to tiff
 mangroves_stack <- c(category_layers1999[[2]], 
@@ -97,38 +171,58 @@ mangroves_stack <- c(category_layers1999[[2]],
                      category_layers2020[[2]],
                      category_layers2022[[2]]
                      )
+
+writeRaster(mangroves_stack,
+          "Data/mangroves_stacked.tif",
+          overwrite = TRUE)
+
+```
+
+```{r echo=FALSE}
 years <- c(1999, 2014, 2018, 2020, 2022)
 names(mangroves_stack) <- years
 
 mangrove_colors <- c("blue", "red")
 
-par(mfrow = c(2, 3))
+par(mfrow = c(2, 3),  mar = c(4, 4, 4, 12))
 for (i in 1:nlyr(mangroves_stack)) {
   plot(mangroves_stack[[i]], col = mangrove_colors, 
        main = paste("Mangrove Presence in", years[i]),
-       axes = TRUE)
+       axes = TRUE,
+  )
+       #legend = FALSE)
+  
+  # par(xpd = TRUE)  # Allow drawing outside the plot area
+ # par(xpd = NA)
+  
+  #legend("topright", inset = c(-0.1, 0),  # Adjust placement outside the plot
+     #    legend = c("No Mangrove", "Mangrove"), 
+    #     fill = mangrove_colors, bty = "n",
+     #    x.intersp = 1.5)
 }
-par(mfrow = c(1, 1))  # Reset layout
+#par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)  # Reset layout
+par(mfrow = c(1, 1))
 plot.new()
-
-writeRaster(mangroves_stack,
-          "C:/Users/rufai/OneDrive/Desktop/GSG\ Courses/GEOG360/Final\ Project/mangroves_stacked.tif",
-          overwrite = TRUE)
 ```
 
-## Trajectory Analysis
 
-You can also embed plots, for example:
+## Step 3: Run trajectory Analysis
+After properly preparing our datasets, we can now run trajectory analysis for our class of interest -- Mangroves and see its evolution across time and space.
 
-```{r echo=TRUE}
-rastStack <- rast("C:/Users/rufai/OneDrive/Desktop/GSG\ Courses/GEOG360/Final\ Project/mangroves_stacked.tif")
-```
-
-### Number of presence of change 
+### I. Load the R package
 
 ```{r echo=TRUE}
 library("timeseriesTrajectories")
+```
 
+### II. Load stacked binarized mangrove dataset
+```{r echo=TRUE}
+rastStack <- rast("Data/mangroves_stacked.tif")
+```
+
+### Compute the number of presence of change and plot
+
+```{r echo=TRUE}
 vert_units <- "number of pixels"
 dataPreview(rastStack,
             timepoints = years,
@@ -152,7 +246,10 @@ presencePlot(num_pres_change,
 
 ```
 
-### Mangrove Trajectories 
+### TODO: Interpret plots 
+@Rufai 
+
+### Compute and visualize mangrove Trajectories 
 
 ```{r echo=TRUE}
 traj_data <- rastertrajData(rastStack,
@@ -160,7 +257,11 @@ traj_data <- rastertrajData(rastStack,
 
 # Let's take a look.
 traj_data
+```
 
+
+```{r echo=TRUE}
+## visualize the trajectories
 trajPlot(traj_data,
          axisShow = "no",
          categoryName = "Mangroves",
@@ -176,8 +277,10 @@ trajPlot(traj_data,
          downsample = TRUE)
 ```
 
+### TODO: Interpret plots 
+@Rufai
 
-### Annual change in Mangrove presence defined by Unified size
+### Compute the annual change in Mangrove presence defined by Unified size
 
 ```{r echo=TRUE}
 stackbar_data <- rasterstackData(rastStack,
@@ -203,11 +306,28 @@ stackbarPlot(stackbar_data,
              lymby2 = 0.1,
              xAngle = 0)
 ```
+### TODO: Interpret plots 
+@Rufai 
 
+
+## Open Questions
+- Evaluation of trajectory analysis,
+- Multi-class trajectory analysis,
+- 
+
+## Extra Resources {#extra-resources}
+1. [R Programming Crash Course](https://www.youtube.com/watch?v=ZYdXI1GteDE) 
+2. [How to Install R and RStudio on Windows](https://www.youtube.com/watch?v=9SzKJH93t5o)
+3. [How to Install R and RStudio on Mac](https://www.youtube.com/watch?v=I5WIMX4LK8M)
+4. [How to Install RTools](https://www.youtube.com/watch?v=VEvw43iF6rY)
+
+
+## Contributors
+1. [Rufai Omowunmi Balogun](https://github.com/Ruphai), Graduate School of Geography, Clark University
+2. [Harrison Leduc](https://github.com/HLed12), Department of Geography, Clark University
+3. [Daniel Neau](https://github.com/danieljneau), Department of Geography, Clark University
+4. [Sunita Phuyal](https://github.com/MeSunita), Graduate School of Geography, Clark University
 
 
 ## References
-
 1. Bilintoh, T.M., Pontius Jr, R,.G., & Zhang, A., (2024). Methods to compare sites concerning a Category’s change during various time intervals. GIScience & Remote Sensing, 61 (1), 14. https://doi.org/10.1080/15481603.2024.2409484
-
-
