@@ -52,7 +52,8 @@ devtools::install_github('bilintoh/timeseriesTrajectories')
 ```
 The second line will give a prompt with additional directions: when prompted type '1' and hit enter, this will update all necessary packages that [timeseriesTrajectories](https://github.com/bilintoh/timeseriesTrajectories) uses.
 
-We also use the terra package, run: 
+We also use the `terra` package, run: 
+
 ```
 install.packages('terra')
 ```
@@ -91,12 +92,10 @@ par(mfrow = c(1, 1))
 ```
 
 ### I. Ensure all the datasets are in the right projection
-To check the projection of your country of interest, you can use [EPSG.io](https://epsg.io/)
+
 In order to get the best representation of the category change, it is recommended to use Equal Area Projection such as the Cylindrical Equal Area when re-projecting the data.
 The Cylindrical Equal-Area Projection is a flexible projection that requires defining the central meridian and standard parallels to minimize distortion for the region of 
 interest.
-
-Insist on an equal area projection.
 
 ```{r echo=TRUE}
 mahakam_rasters <- list(ras1999, ras2014, ras2018, ras2020, ras2022)
@@ -110,7 +109,6 @@ It is not clear from this what the Coordinate Reference System is, hence we will
 cyl_equal_area_crs <- "+proj=cea +lon_0=120 +lat_ts=0 +datum=WGS84 +units=m +no_defs"
 for (i in seq_along(mahakam_rasters)) {
     crs(mahakam_rasters[[i]]) <- cyl_equal_area_crs
-    print(crs(mahakam_rasters[[i]]))
 }
 
 ```
@@ -119,54 +117,53 @@ for (i in seq_along(mahakam_rasters)) {
 mahakam_rasters_reprojected <- lapply(mahakam_rasters, function(raster) {
     project(raster, cyl_equal_area_crs)
 })
-lapply(mahakam_rasters_reprojected, function(raster) print(crs(raster)))
 
 ```
 ### II. Binarize the yearly images
 ```{r echo=TRUE}
 # extract categories
-categories1999 <- unique(values(ras1999))
+categories1999 <- unique(values(mahakam_rasters_reprojected[[1]])) # 1999
 categories1999 <- categories1999[!is.na(categories1999)]
 
-categories2014 <- unique(values(ras2014))
+categories2014 <- unique(values(mahakam_rasters_reprojected[[2]])) # 2014
 categories2014 <- categories2014[!is.na(categories2014)]
 
-categories2018 <- unique(values(ras2018))
+categories2018 <- unique(values(mahakam_rasters_reprojected[[3]])) # 2018
 categories2018 <- categories2018[!is.na(categories2018)]
 
-categories2020 <- unique(values(ras2020))
+categories2020 <- unique(values(mahakam_rasters_reprojected[[4]])) # 2020
 categories2020 <- categories2020[!is.na(categories2020)]
 
-categories2022 <- unique(values(ras2022))
+categories2022 <- unique(values(mahakam_rasters_reprojected[[5]])) # 2022
 categories2022 <- categories2022[!is.na(categories2022)]
 
 # generate binary maps per year
 category_layers2022 <- lapply(categories2022, function(cat) {
-  layer <- ras2022 == cat
+  layer <- mahakam_rasters_reprojected[[5]] == cat
   names(layer) <- paste0("category2022_", cat)
   return(layer)
 })
 
 category_layers2020 <- lapply(categories2020, function(cat) {
-  layer <- ras2020 == cat
+  layer <- mahakam_rasters_reprojected[[4]] == cat
   names(layer) <- paste0("category2020_", cat)
   return(layer)
 })
 
 category_layers2018 <- lapply(categories2018, function(cat) {
-  layer <- ras2018 == cat
+  layer <- mahakam_rasters_reprojected[[3]] == cat
   names(layer) <- paste0("category2018_", cat)
   return(layer)
 })
 
 category_layers2014 <- lapply(categories2014, function(cat) {
-  layer <- ras2014 == cat
+  layer <- mahakam_rasters_reprojected[[2]] == cat
   names(layer) <- paste0("category2014_", cat)
   return(layer)
 })
 
 category_layers1999 <- lapply(categories1999, function(cat) {
-  layer <- ras1999 == cat
+  layer <- mahakam_rasters_reprojected[[1]] == cat
   names(layer) <- paste0("category1999_", cat)
   return(layer)
 })
@@ -181,14 +178,14 @@ This step saves the yearly binary images for mangrove into a stack and save as a
 
 # stack mangroves categories across five time points and save to tiff
 mangroves_stack <- c(category_layers1999[[2]], 
-                     category_layers2014[[3]], 
+                     category_layers2014[[3]], # mangrove category was stored as 3
                      category_layers2018[[2]],
                      category_layers2020[[2]],
                      category_layers2022[[2]]
                      )
 
 writeRaster(mangroves_stack,
-          "Data/mangroves_stacked.tif",
+          "data/mangroves_stacked.tif",
           overwrite = TRUE)
 
 ```
@@ -221,7 +218,7 @@ library("timeseriesTrajectories")
 ### II. Load stacked binarized mangrove dataset
 
 ```{r echo=TRUE}
-rastStack <- rast("Data/mangroves_stacked.tif")
+rastStack <- rast("data/mangroves_stacked.tif")
 ```
 
 ### Compute the number of presence of change and plot
