@@ -2,7 +2,9 @@
 title: "A How-to Guide for Trajectory Analysis"
 author: "Rufai Omowunmi Balogun,  Harrison Leduc, Daniel Neau, Sunita Phuyal"
 date: "2024-11-13"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -55,8 +57,6 @@ We also use the terra package, run:
 install.packages('terra')
 ```
 
-
-
 ## Step 2: Data Preparation
 This sections showcases the steps needed to go from a multi-class categorical data to a binary data format required to run a trajectory analysis.
 
@@ -65,16 +65,15 @@ We are reviewing the Mahakam Delta in Indonesia. Specifically, how mangroves tra
 
 ```{r echo=TRUE}
 ## load packages
-library(raster)
 library(terra)
 
 # four categories in our datasets::: 1. Mangrove, 2. Pond Aquaculture, 3. Water, and 4. Other LandCover
 ## load datasets
-ras1999 <- rast("Data/Mahakam_1999.rst")
-ras2014 <- rast("Data/Mahakam_2014.rst")
-ras2018 <- rast("Data//Mahakam_2018.rst")
-ras2020 <- rast("Data//Mahakam_2020.rst")
-ras2022 <- rast("Data//Mahakam_2022.rst")
+ras1999 <- rast("data/Mahakam_1999.rst")
+ras2014 <- rast("data/Mahakam_2014.rst")
+ras2018 <- rast("data//Mahakam_2018.rst")
+ras2020 <- rast("data//Mahakam_2020.rst")
+ras2022 <- rast("data//Mahakam_2022.rst")
 ```
 
 ### We start with these Multiclass datasets across 5 timepoints
@@ -84,29 +83,45 @@ mahakam_rasters <- list(ras1999, ras2014, ras2018, ras2020, ras2022)
 years <- c(1999, 2014, 2018, 2020, 2022)
 par(mfrow = c(2, 3))
 for (i in seq_along(mahakam_rasters)) {
+  coltab(mahakam_rasters[[i]]) <- data.frame(values=c(1, 3, 4, 5), cols=rainbow(4))
   plot(mahakam_rasters[[i]], main = paste("Year:", years[i]))
 }
 par(mfrow = c(1, 1))
+
 ```
 
 ### I. Ensure all the datasets are in the right projection
 To check the projection of your country of interest, you can use [EPSG.io](https://epsg.io/)
+In order to get the best representation of the category change, it is recommended to use Equal Area Projection such as the Cylindrical Equal Area when re-projecting the data.
+The Cylindrical Equal-Area Projection is a flexible projection that requires defining the central meridian and standard parallels to minimize distortion for the region of 
+interest.
+
+Insist on an equal area projection.
+
 ```{r echo=TRUE}
 mahakam_rasters <- list(ras1999, ras2014, ras2018, ras2020, ras2022)
 for (i in seq_along(mahakam_rasters)) {
     print(crs(mahakam_rasters[[i]]))
 }
 ```
-It is not clear from this what the Coordinate Reference System is, hence we will assign the CRS for the Mahakam Delta to each of our data input to ensure they overlap properly.
+It is not clear from this what the Coordinate Reference System is, hence we will assign the CRS for the Mahakam Delta and reproject to the to each of our data input to ensure they overlap properly.
 
 ```{r echo=TRUE}
+cyl_equal_area_crs <- "+proj=cea +lon_0=120 +lat_ts=0 +datum=WGS84 +units=m +no_defs"
 for (i in seq_along(mahakam_rasters)) {
-    crs(mahakam_rasters[[i]]) <- "EPSG:23831"
+    crs(mahakam_rasters[[i]]) <- cyl_equal_area_crs
     print(crs(mahakam_rasters[[i]]))
 }
 
 ```
 
+```{r echo=TRUE}
+mahakam_rasters_reprojected <- lapply(mahakam_rasters, function(raster) {
+    project(raster, cyl_equal_area_crs)
+})
+lapply(mahakam_rasters_reprojected, function(raster) print(crs(raster)))
+
+```
 ### II. Binarize the yearly images
 ```{r echo=TRUE}
 # extract categories
@@ -190,19 +205,7 @@ for (i in 1:nlyr(mangroves_stack)) {
        main = paste("Mangrove Presence in", years[i]),
        axes = TRUE,
   )
-       #legend = FALSE)
-  
-  # par(xpd = TRUE)  # Allow drawing outside the plot area
- # par(xpd = NA)
-  
-  #legend("topright", inset = c(-0.1, 0),  # Adjust placement outside the plot
-     #    legend = c("No Mangrove", "Mangrove"), 
-    #     fill = mangrove_colors, bty = "n",
-     #    x.intersp = 1.5)
 }
-#par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)  # Reset layout
-par(mfrow = c(1, 1))
-plot.new()
 ```
 
 
@@ -216,6 +219,7 @@ library("timeseriesTrajectories")
 ```
 
 ### II. Load stacked binarized mangrove dataset
+
 ```{r echo=TRUE}
 rastStack <- rast("Data/mangroves_stacked.tif")
 ```
@@ -240,23 +244,17 @@ presencePlot(num_pres_change,
              categoryName = "Mangroves",
              xAxis = "Longitude (m)",
              yAxis = "Latitude (m)",
-             axisText = 1,
-             axisLabel = 1,
-             plotTitle = 1.2)
+             axisText = 0.7,
+             axisLabel = 0.7,
+             plotTitle = 0.8)
 
 ```
-
-### TODO: Interpret plots 
-@Rufai 
 
 ### Compute and visualize mangrove Trajectories 
 
 ```{r echo=TRUE}
 traj_data <- rastertrajData(rastStack,
                             zeroabsence = 'yes')
-
-# Let's take a look.
-traj_data
 ```
 
 
@@ -267,18 +265,16 @@ trajPlot(traj_data,
          categoryName = "Mangroves",
          narrowPos = NA,
          scalePos = NA,
-         scaleSize = 1.5,
+         scaleSize = 1.2,
          axisText = 1.2,
          axisLabel = 1.2,
-         plotTitle = 1,
-         legendTex = 1,
+         plotTitle = 1.2,
+         legendTex = 0.8,
          xAxis = "Longitude (m)",
          yAxis = "Latitude (m)",
          downsample = TRUE)
 ```
 
-### TODO: Interpret plots 
-@Rufai
 
 ### Compute the annual change in Mangrove presence defined by Unified size
 
@@ -306,14 +302,12 @@ stackbarPlot(stackbar_data,
              lymby2 = 0.1,
              xAngle = 0)
 ```
-### TODO: Interpret plots 
-@Rufai 
+
 
 
 ## Open Questions
 - Evaluation of trajectory analysis,
 - Multi-class trajectory analysis,
-- 
 
 ## Extra Resources {#extra-resources}
 1. [R Programming Crash Course](https://www.youtube.com/watch?v=ZYdXI1GteDE) 
@@ -331,3 +325,5 @@ stackbarPlot(stackbar_data,
 
 ## References
 1. Bilintoh, T.M., Pontius Jr, R,.G., & Zhang, A., (2024). Methods to compare sites concerning a Category’s change during various time intervals. GIScience & Remote Sensing, 61 (1), 14. https://doi.org/10.1080/15481603.2024.2409484
+2. Center for Geospatial Analytics, [Coastal Habitat Mapping Portal](https://www.clarku.edu/centers/geospatial-analytics/projects/pond-aquaculture-and-its-impact-on-mangroves-and-other-coastal-wetlands/)
+3. Explainer Video for Bilintoh et al. 2024. (by Mangrove3)
