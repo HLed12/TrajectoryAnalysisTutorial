@@ -20,7 +20,9 @@ This dataset was provided by the Center for Geospatial Analytics (CGA) [Coastal 
 
 This repository provides a comprehensive hands-on tutorial for implementing the [`timeseriesTrajectories`](https://github.com/bilintoh/timeseriesTrajectories) R package.
 
-A follow through guide is showcased in this [R Markdown]().
+A follow through guide in R is showcased in this [R Markdown](https://github.com/HLed12/TrajectoryAnalysisTutorial/blob/main/TrajectoryAnalysisTutorial.Rmd).
+
+To view the guide, without downloading any files, we utilize this 'htmlpreview' for github: ['TrajectoryAnalysisTutorial_Viewer'](https://htmlpreview.github.io/?https://github.com/HLed12/TrajectoryAnalysisTutorial/blob/main/TrajectoryAnalysisTutorial.html)
 
 ## Contributors
 1. [Rufai Omowunmi Balogun](https://github.com/Ruphai), Graduate School of Geography, Clark University
